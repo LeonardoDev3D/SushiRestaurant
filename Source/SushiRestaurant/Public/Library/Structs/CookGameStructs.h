@@ -29,7 +29,5 @@ struct FFoodRecipe
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EFoodType FoodResult;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float ProcessingTime = 5.f;
-	
+
 };

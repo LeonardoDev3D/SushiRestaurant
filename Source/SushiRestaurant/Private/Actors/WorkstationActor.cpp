@@ -3,9 +3,11 @@
 
 #include "Actors/WorkstationActor.h"
 
+#include "Actors/FoodActor.h"
 #include "Actors/IngredientActor.h"
 #include "Library/Structs/CookGameStructs.h"
 #include "Components/SceneComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
@@ -86,7 +88,7 @@ void AWorkstationActor::Server_ProcessIngredient_Implementation()
 	if (CurrentState != EWorkstationState::Adding) return;
 
 	SetState(EWorkstationState::Processing);
-	GetWorld()->GetTimerManager().SetTimer(ProcessingTimer, this, &AWorkstationActor::FinishProcessing, 3.0f, false);
+	GetWorld()->GetTimerManager().SetTimer(ProcessingTimer, this, &AWorkstationActor::FinishProcessing, 5.0f, false);
 	
 }
 
@@ -150,16 +152,40 @@ void AWorkstationActor::FinishProcessing()
 			}
 		}	
 	}
-	
+
+	// Clear ingredients and set cooked food ready
 	CurrentIngredients.Empty();
 	
 	SetState(EWorkstationState::Ready);
-	
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Finished cook!"));
 
-	// Debug food name
-	FString FoodResultName = StaticEnum<EFoodType>()->GetValueAsString(FoodResult);
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Food is %s!"), *FoodResultName));
+	Server_SpawnFood(GetActorLocation() + FVector(0,0,50),FoodResult);
+	
+}
+
+void AWorkstationActor::Server_SpawnFood_Implementation(FVector Location, EFoodType InFoodType)
+{
+	// Make Spawn Tranforms
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(Location);
+	SpawnTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+
+	// Begin Spawn
+	AFoodActor* FinalDish = Cast<AFoodActor>(
+		UGameplayStatics::BeginDeferredActorSpawnFromClass(
+			this,
+			FoodClass,
+			SpawnTransform
+		)
+	);
+
+	if (FinalDish)
+	{
+		FinalDish->FoodType = InFoodType;
+		
+		FinalDish->OnFoodSpawned();
+		
+		UGameplayStatics::FinishSpawningActor(FinalDish, SpawnTransform);
+	}
 }
 
 void AWorkstationActor::OnRep_WorkstationState()

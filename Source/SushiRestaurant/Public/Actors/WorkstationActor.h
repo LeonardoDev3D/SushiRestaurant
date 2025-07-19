@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FoodActor.h"
 #include "GameFramework/Actor.h"
 #include "Library/Enums/CookGameEnums.h"
 #include "Library/Structs/CookGameStructs.h"
@@ -35,7 +36,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WorkstationSettings")
 	bool AttachIngredients = false;
 
-	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WorkstationSettings")
+	TSubclassOf<AFoodActor> FoodClass ;
 public:	
 	// Sets default values for this actor's properties
 	AWorkstationActor();
@@ -67,6 +69,9 @@ public:
 	void Server_CollectDish(class ACookCharacter* Player);
 	void Server_CollectDish_Implementation(class ACookCharacter* Player);
 
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnFood(FVector Location, EFoodType InFoodType);
+	void Server_SpawnFood_Implementation(FVector Location, EFoodType InFoodType);
 	
 protected:
 

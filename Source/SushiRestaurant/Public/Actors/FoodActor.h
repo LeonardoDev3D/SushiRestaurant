@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Library/Enums/CookGameEnums.h"
 #include "FoodActor.generated.h"
 
 UCLASS()
@@ -15,6 +16,12 @@ public:
 	// Sets default values for this actor's properties
 	AFoodActor();
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FoodActor")
+	EFoodType FoodType;
+
+	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Mesh)
+	UStaticMeshComponent* FoodMesh;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -24,4 +31,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category="Food")
+	void OnFoodSpawned();
+	virtual void OnFoodSpawned_Implementation();
 };

@@ -9,6 +9,8 @@ AFoodActor::AFoodActor()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	FoodMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FoodMesh"));
+	
 	bReplicates = true;
 }
 
@@ -16,7 +18,6 @@ AFoodActor::AFoodActor()
 void AFoodActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -30,5 +31,10 @@ void AFoodActor::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& Out
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	
+}
+
+void AFoodActor::OnFoodSpawned_Implementation()
+{
+	// Used on blueprint
 }
 
