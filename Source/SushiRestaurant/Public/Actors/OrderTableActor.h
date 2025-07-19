@@ -17,6 +17,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Collision", meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* OrderTableCollision;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Settings")
+	int32 TableIndex;
 	
 	// Sets default values for this actor's properties
 	AOrderTableActor();

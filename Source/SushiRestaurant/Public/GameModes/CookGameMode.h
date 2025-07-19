@@ -18,5 +18,16 @@ public:
 	
 	/** Constructor */
 	ACookGameMode();
+
+	virtual void BeginPlay() override;
 	
+	/** Create new order */
+	UFUNCTION(BlueprintCallable, Category="Orders")
+	void SpawnOrder();
+
+protected:
+	FTimerHandle OrderSpawnTimer;
+
+	UPROPERTY(EditDefaultsOnly, Category="Orders")
+	float OrderInterval = 15.0f;	
 };

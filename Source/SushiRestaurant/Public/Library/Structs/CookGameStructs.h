@@ -12,9 +12,7 @@ struct FOrder
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<EFoodType> RequiredFoods;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float TimeRemaining = 30.f; // limit time to do the order
+	
 };
 
 

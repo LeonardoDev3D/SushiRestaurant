@@ -14,6 +14,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Actors/IngredientActor.h"
+#include "Actors/OrderTableActor.h"
 #include "Actors/TrashActor.h"
 #include "Actors/WorkstationActor.h"
 #include "Net/UnrealNetwork.h"
@@ -84,7 +85,7 @@ void ACookCharacter::Look(const FInputActionValue& Value)
 void ACookCharacter::Interact()
 {
 	FVector Start = GetActorLocation() + 30.0f;
-	FVector End = Start + GetActorForwardVector() * 200.f;
+	FVector End = Start + GetActorForwardVector() * 250.f;
 
 	// Box Size
 	FVector BoxHalfSize = FVector(30.f, 30.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
@@ -129,9 +130,11 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 			FCollisionShape::MakeBox(Extent),
 			Params))
 	{
-		// Store workstation case its traced
+		// Store actors
 		AWorkstationActor* Workstation = Cast<AWorkstationActor>(Hit.GetActor());
 		ATrashActor* Trash = Cast<ATrashActor>(Hit.GetActor());
+		AOrderTableActor* Table = Cast<AOrderTableActor>(Hit.GetActor());
+		
 		if (!HeldItem)
 		{
 			// Grab ingredient
@@ -144,6 +147,7 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 				// Collect read food if the same is done
 				Workstation-> Server_CollectDish(this);
 			}
+			
 		}
 		else
 		{
@@ -173,6 +177,14 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 					HeldItem = nullptr;
 				}
 			
+			}
+
+			if (Table)
+			{
+				// Delivery to table
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Interact with table!"));
+				AFoodActor* HeldFood = Cast<AFoodActor>(HeldItem);
+				Server_DeliveryToTable(Table,HeldFood);
 			}
 			
 		}
@@ -219,6 +231,15 @@ void ACookCharacter::DropItem(AActor* InItem)
 	if (InItem)
 	{
 		InItem -> DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		HeldItem = nullptr;
+	}
+}
+
+void ACookCharacter::Server_DeliveryToTable_Implementation(AOrderTableActor* Table, AFoodActor* Food)
+{
+	if (Table && Food)
+	{
+		Table->Server_DeliverOrder(Food);
 		HeldItem = nullptr;
 	}
 }

@@ -95,6 +95,10 @@ protected:
 	void Multicast_DropItem_Implementation(AActor* InItem);
 	
 	void DropItem(AActor* InItem);
+
+	UFUNCTION(Server, Reliable)
+	void Server_DeliveryToTable(AOrderTableActor* Table, AFoodActor* Food);
+	void Server_DeliveryToTable_Implementation(AOrderTableActor* Table, AFoodActor* Food);
 public:
 	
 	UFUNCTION(BlueprintPure)
