@@ -28,7 +28,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Settings")
 	float Speed = 0.0f;
-	
+
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Settings")
+	float NormalizedSpeed = 0.0f;
 protected:
 	
 	UPROPERTY()

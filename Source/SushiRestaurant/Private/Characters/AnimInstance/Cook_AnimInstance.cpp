@@ -3,6 +3,8 @@
 
 #include "Characters/AnimInstance/Cook_AnimInstance.h"
 
+#include "GameFramework/CharacterMovementComponent.h"
+
 void UCook_AnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
@@ -38,4 +40,5 @@ void UCook_AnimInstance::UpdateMovement(float DeltaSeconds)
 {
 	Speed = CharacterPtr -> GetVelocity().Size2D();
 	bIsMoving = Speed > 0.0f;
+	NormalizedSpeed = Speed / CharacterPtr -> GetCharacterMovement() -> MaxWalkSpeed;
 }
