@@ -2,8 +2,11 @@
 
 
 #include "GameModes/CookGameMode.h"
+
+#include "GameFramework/PlayerStart.h"
 #include "Library/Enums/CookGameEnums.h"
 #include "GameState/CookGameState.h"
+#include "Kismet/GameplayStatics.h"
 
 ACookGameMode::ACookGameMode()
 {
@@ -43,4 +46,25 @@ void ACookGameMode::SpawnOrder()
 		IngredientList += Name + TEXT(" ");
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,FString::Printf(TEXT("Table %d Did Order: %s"), TableIndex, *IngredientList));
+}
+
+AActor* ACookGameMode::ChoosePlayerStart_Implementation(AController* Player)
+{
+	
+
+	// Store detected player starts
+	if (PlayerStartPoints.Num() == 0)
+	{
+		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), PlayerStartPoints);
+	}
+
+	// Get Player Index
+	int32 PlayerIndex = GameState.Get() ? GameState->PlayerArray.IndexOfByKey(Player->PlayerState) : 0;
+	if (PlayerStartPoints.IsValidIndex(PlayerIndex))
+	{
+		return PlayerStartPoints[PlayerIndex];
+	}
+
+	// Get default location when the player start is not detected
+	return Super::ChoosePlayerStart_Implementation(Player);
 }

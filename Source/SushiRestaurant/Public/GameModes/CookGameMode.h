@@ -29,5 +29,11 @@ protected:
 	FTimerHandle OrderSpawnTimer;
 
 	UPROPERTY(EditDefaultsOnly, Category="Orders")
-	float OrderInterval = 15.0f;	
+	float OrderInterval = 15.0f;
+
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+	
+	UPROPERTY()
+	TArray<AActor*> PlayerStartPoints;
+	
 };
