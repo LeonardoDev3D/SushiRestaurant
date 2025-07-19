@@ -85,6 +85,15 @@ protected:
 
 	void GrabItem(AActor* InItem);
 
+
+	UFUNCTION(Server, Reliable)
+	void Server_DropItem(AActor* InItem);
+	void Server_DropItem_Implementation(AActor* InItem);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DropItem(AActor* InItem);
+	void Multicast_DropItem_Implementation(AActor* InItem);
+	
 	void DropItem(AActor* InItem);
 public:
 	

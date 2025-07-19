@@ -96,7 +96,7 @@ void ACookCharacter::Interact()
 
 void ACookCharacter::DiscardIngredients()
 {
-	Jump();
+	Server_DropItem(HeldItem);
 }
 
 
@@ -111,7 +111,8 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 	FHitResult Hit;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-	
+
+	// Box trace
 	if (GetWorld()->SweepSingleByChannel(
 			Hit,
 			InStart,
@@ -121,7 +122,9 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 			FCollisionShape::MakeBox(Extent),
 			Params))
 	{
+		// Store workstation case its traced
 		AWorkstationActor* Workstation = Cast<AWorkstationActor>(Hit.GetActor());
+		
 		if (!HeldItem)
 		{
 			// Grab ingredient
@@ -159,11 +162,7 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 		}
 		
 	}
-	else 
-	{
-		DropItem(HeldItem);
-	}
-	
+		
 }
 
 void ACookCharacter::GrabItem(AActor* InItem)
@@ -174,6 +173,16 @@ void ACookCharacter::GrabItem(AActor* InItem)
 		HeldActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeldSocketName);
 		HeldItem = HeldActor;
 	}
+}
+
+void ACookCharacter::Server_DropItem_Implementation(AActor* InItem)
+{
+	Multicast_DropItem(InItem);
+}
+
+void ACookCharacter::Multicast_DropItem_Implementation(AActor* InItem)
+{
+	DropItem(InItem);
 }
 
 void ACookCharacter::DropItem(AActor* InItem)

@@ -66,12 +66,13 @@ void AWorkstationActor::Server_ProcessIngredient_Implementation()
 
 void AWorkstationActor::Server_CollectDish_Implementation(class ACookCharacter* Player)
 {
-	CurrentIngredients.Empty();
-	SetState(EWorkstationState::Ready);
+	
 }
 
 void AWorkstationActor::FinishProcessing()
 {
+	CurrentIngredients.Empty();
+	SetState(EWorkstationState::Ready);
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Finished cook!"));
 }
 
