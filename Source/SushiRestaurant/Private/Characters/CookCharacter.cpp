@@ -13,6 +13,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Actors/IngredientActor.h"
+#include "Net/UnrealNetwork.h"
 
 // Sets default values
 ACookCharacter::ACookCharacter()
@@ -49,7 +51,7 @@ ACookCharacter::ACookCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
-
+	
 }
 
 // Called when the game starts or when spawned
@@ -75,6 +77,72 @@ void ACookCharacter::Look(const FInputActionValue& Value)
 
 	// route the input
 	DoLook(LookAxisVector.X, LookAxisVector.Y);
+}
+
+void ACookCharacter::Interact()
+{
+	FVector Start = GetActorLocation() + 30.0f;
+	FVector End = Start + GetActorForwardVector() * 200.f;
+
+	// Box Size
+	FVector BoxHalfSize = FVector(30.f, 30.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+
+	// Box rotation based on character rotation
+	FRotator Orientation = GetActorRotation();
+	Server_TraceInteract(Start,End,BoxHalfSize,Orientation);
+	
+}
+
+void ACookCharacter::DiscardIngredients()
+{
+	Jump();
+}
+
+
+void ACookCharacter::Server_TraceInteract_Implementation(FVector InStart, FVector InEnd, FVector Extent, FRotator Rotation)
+{
+	Multicast_TraceInteract(InStart,InEnd,Extent,Rotation);
+}
+
+void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVector InEnd, FVector Extent,
+	FRotator Rotation)
+{
+	FHitResult Hit;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	
+	if (GetWorld()->SweepSingleByChannel(
+			Hit,
+			InStart,
+			InEnd,
+			Rotation.Quaternion(),
+			InteractionTraceChannel,
+			FCollisionShape::MakeBox(Extent),
+			Params))
+	{
+		if (!HeldItem)
+		{
+			// Grab ingredient
+			if (AIngredientActor* Ingredient = Cast<AIngredientActor>(Hit.GetActor()))
+			{
+				GrabItem(Ingredient);
+			}
+		}
+		else
+		{
+			// Cook / drop
+		}
+		
+	}
+}
+
+void ACookCharacter::GrabItem(AActor* InItem)
+{
+	// Grab ingredient
+	if (AActor* HeldActor = InItem)
+	{
+		HeldActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeldSocketName);
+	}
 }
 
 void ACookCharacter::DoMove(float Right, float Forward)
@@ -107,11 +175,6 @@ void ACookCharacter::DoLook(float Yaw, float Pitch)
 	}
 }
 
-void ACookCharacter::DoInteraction()
-{
-	
-}
-
 // Called every frame
 void ACookCharacter::Tick(float DeltaTime)
 {
@@ -131,7 +194,20 @@ void ACookCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACookCharacter::Look);
+
+		// Interact
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ACookCharacter::Interact);
+
+		// Discard Ingredients
+		EnhancedInputComponent->BindAction(DiscardAction, ETriggerEvent::Started, this, &ACookCharacter::DiscardIngredients);
 	}
 	
+}
+
+void ACookCharacter::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ACookCharacter, HeldItem);
 }
 

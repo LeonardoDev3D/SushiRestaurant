@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Actors/IngredientActor.h"
 #include "GameFramework/Character.h"
 #include "CookCharacter.generated.h"
 
@@ -41,6 +42,17 @@ protected:
 	/** Interact like cook Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
 	UInputAction* InteractAction;
+
+	/** Interact like cook Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Input")
+	UInputAction* DiscardAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Interation")
+	TEnumAsByte<ECollisionChannel> InteractionTraceChannel = ECC_Visibility;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Interation")
+	FName HeldSocketName;
+public:
 	
 public:
 	// Sets default values for this character's properties
@@ -55,10 +67,24 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+	void Interact();
+
+	void DiscardIngredients();
+
+	/** Current held object */
+	UPROPERTY(Replicated)
+	AIngredientActor* HeldItem;
 	
+	UFUNCTION(Server, Reliable)
+	void Server_TraceInteract(FVector InStart, FVector InEnd, FVector Extent, FRotator Rotation);
+	void Server_TraceInteract_Implementation(FVector InStart, FVector InEnd, FVector Extent, FRotator Rotation);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_TraceInteract(FVector InStart, FVector InEnd, FVector Extent, FRotator Rotation);
+	void Multicast_TraceInteract_Implementation(FVector InStart, FVector InEnd, FVector Extent, FRotator Rotation);
+
+	void GrabItem(AActor* InItem);
 public:
-
-
 	
 	/** Handles move inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
@@ -67,11 +93,6 @@ public:
 	/** Handles look inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")
 	virtual void DoLook(float Yaw, float Pitch);
-
-	
-	/** Handles jump pressed inputs from either controls or UI interfaces */
-	UFUNCTION(BlueprintCallable, Category="Input")
-	virtual void DoInteraction();
 	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -79,6 +100,9 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
+
+	
 public:
 
 	/** Returns CameraBoom subobject **/
@@ -86,4 +110,6 @@ public:
 
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	
 };

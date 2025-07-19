@@ -14,7 +14,7 @@ class SUSHIRESTAURANT_API AIngredientActor : public AActor
 	
 protected:
 
-	UPROPERTY(BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* IngredientMesh;
 public:	
 	// Sets default values for this actor's properties
