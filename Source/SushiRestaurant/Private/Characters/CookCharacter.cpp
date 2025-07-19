@@ -121,6 +121,7 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 			FCollisionShape::MakeBox(Extent),
 			Params))
 	{
+		AWorkstationActor* Workstation = Cast<AWorkstationActor>(Hit.GetActor());
 		if (!HeldItem)
 		{
 			// Grab ingredient
@@ -131,16 +132,30 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 		}
 		else
 		{
-			// Cook / drop
-			if (AWorkstationActor* Workstation = Cast<AWorkstationActor>(Hit.GetActor()))
+			// Add ingredients on workstation
+			if (Workstation )
 			{
 				if (AIngredientActor*Ingredient = Cast<AIngredientActor>(HeldItem))
 				{
-					Workstation ->ServerProcessIngredient(Ingredient);
+					if (Workstation->GetCurrentAddedIngredients() < 2)
+					{
+						Workstation-> Server_AddIngredient(Ingredient);
+						HeldItem = nullptr;
+					}
+					
 				}
 				
 			}
 			
+		}
+
+		if (Workstation)
+		{
+			if (Workstation->GetCurrentAddedIngredients() == 2)
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Begin cook!"));
+				Workstation-> Server_ProcessIngredient();
+			}
 		}
 		
 	}

@@ -33,18 +33,56 @@ void AWorkstationActor::Tick(float DeltaTime)
 void AWorkstationActor::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AWorkstationActor, CurrentIngredients);
+	DOREPLIFETIME(AWorkstationActor, CurrentState);
 }
 
-void AWorkstationActor::ServerProcessIngredient_Implementation(AIngredientActor* Ingredient)
+void AWorkstationActor::Server_AddIngredient_Implementation(AIngredientActor* Ingredient)
+{
+  
+	if (!Ingredient) return; // Check if ingredient is valid -> Avoid null actors
+
+	if (CurrentState == EWorkstationState::Processing || CurrentState == EWorkstationState::Ready) return; // Check if the workstation is in use
+	
+	if (!IngredientsList.Contains(Ingredient->IngredientType)) return; // Check if this ingredient can be used on this workstation
+	
+	
+	if (CurrentIngredients.Num() < 2)
+	{
+		CurrentIngredients.Add(Ingredient);
+		Ingredient->Destroy();
+		SetState(EWorkstationState::Adding);
+	}
+}
+
+void AWorkstationActor::Server_ProcessIngredient_Implementation()
+{
+	if (CurrentState != EWorkstationState::Adding) return;
+
+	SetState(EWorkstationState::Processing);
+	GetWorld()->GetTimerManager().SetTimer(ProcessingTimer, this, &AWorkstationActor::FinishProcessing, 3.0f, false);
+	
+}
+
+void AWorkstationActor::Server_CollectDish_Implementation(class ACookCharacter* Player)
+{
+	CurrentIngredients.Empty();
+	SetState(EWorkstationState::Ready);
+}
+
+void AWorkstationActor::FinishProcessing()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Finished cook!"));
+}
+
+void AWorkstationActor::OnRep_WorkstationState()
 {
 	
-	if (Ingredient)
-	{
-		if (IngredientsList.Contains(Ingredient->IngredientType))
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Cook!"));
-		}
-		
-	}
+}
+
+void AWorkstationActor::SetState(EWorkstationState NewState)
+{
+	CurrentState = NewState;
+	OnRep_WorkstationState();
 }
 

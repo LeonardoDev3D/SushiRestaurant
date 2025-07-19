@@ -20,6 +20,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	TArray<EIngredientType> IngredientsList;
 	
+	UPROPERTY(ReplicatedUsing=OnRep_WorkstationState, BlueprintReadOnly)
+	EWorkstationState CurrentState;
+	
+	FTimerHandle ProcessingTimer;
+	
+	UPROPERTY(Replicated)
+	TArray<AIngredientActor*> CurrentIngredients;
+	
 public:	
 	// Sets default values for this actor's properties
 	AWorkstationActor();
@@ -34,6 +42,27 @@ public:
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION(BlueprintPure)
+	int GetCurrentAddedIngredients()const{return CurrentIngredients.Num();};
+	
+	UFUNCTION(Server, Reliable)		
+	void Server_AddIngredient(AIngredientActor* Ingredient);
+	void Server_AddIngredient_Implementation(AIngredientActor* Ingredient);
+	
 	UFUNCTION(Server, Reliable)
-	void ServerProcessIngredient(AIngredientActor* Ingredient);
+	void Server_ProcessIngredient();
+	void Server_ProcessIngredient_Implementation();
+
+	UFUNCTION(Server, Reliable)
+	void Server_CollectDish(class ACookCharacter* Player);
+	void Server_CollectDish_Implementation(class ACookCharacter* Player);
+
+protected:
+
+	void FinishProcessing();
+
+	UFUNCTION()					
+	void OnRep_WorkstationState();
+
+	void SetState(EWorkstationState NewState);
 };

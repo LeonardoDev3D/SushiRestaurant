@@ -26,3 +26,12 @@ enum class EIngredientType : uint8
 	SeaUrchin,
 	MAX
 };
+
+UENUM(BlueprintType)
+enum class EWorkstationState : uint8
+{
+	StandBy,     // No ingredients
+	Adding,      // Receiving ingredients
+	Processing,  // Making the food
+	Ready        // Dish ready
+};

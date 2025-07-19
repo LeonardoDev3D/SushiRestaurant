@@ -20,12 +20,14 @@ struct FOrder
 
 
 USTRUCT(BlueprintType)
-struct FFood
+struct FFoodRecipe
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	AWorkstationActor* WorkstationActor;
-
-    // Define here a class of food
+	TArray<EIngredientType> RequiredIngredients;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float ProcessingTime = 5.f;
+	
 };
