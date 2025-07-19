@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Actors/WorkstationActor.h"
 #include "CookGameStructs.generated.h"
 
 USTRUCT(BlueprintType)
@@ -15,4 +16,16 @@ struct FOrder
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeRemaining = 30.f; // limit time to do the order
+};
+
+
+USTRUCT(BlueprintType)
+struct FFood
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	AWorkstationActor* WorkstationActor;
+
+    // Define here a class of food
 };

@@ -73,7 +73,7 @@ protected:
 
 	/** Current held object */
 	UPROPERTY(Replicated)
-	AIngredientActor* HeldItem;
+	AActor* HeldItem;
 	
 	UFUNCTION(Server, Reliable)
 	void Server_TraceInteract(FVector InStart, FVector InEnd, FVector Extent, FRotator Rotation);
@@ -84,6 +84,8 @@ protected:
 	void Multicast_TraceInteract_Implementation(FVector InStart, FVector InEnd, FVector Extent, FRotator Rotation);
 
 	void GrabItem(AActor* InItem);
+
+	void DropItem(AActor* InItem);
 public:
 	
 	/** Handles move inputs from either controls or UI interfaces */

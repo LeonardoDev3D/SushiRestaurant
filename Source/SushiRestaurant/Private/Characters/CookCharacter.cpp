@@ -14,6 +14,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Actors/IngredientActor.h"
+#include "Actors/WorkstationActor.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
@@ -131,9 +132,23 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 		else
 		{
 			// Cook / drop
+			if (AWorkstationActor* Workstation = Cast<AWorkstationActor>(Hit.GetActor()))
+			{
+				if (AIngredientActor*Ingredient = Cast<AIngredientActor>(HeldItem))
+				{
+					Workstation ->ServerProcessIngredient(Ingredient);
+				}
+				
+			}
+			
 		}
 		
 	}
+	else 
+	{
+		DropItem(HeldItem);
+	}
+	
 }
 
 void ACookCharacter::GrabItem(AActor* InItem)
@@ -142,6 +157,17 @@ void ACookCharacter::GrabItem(AActor* InItem)
 	if (AActor* HeldActor = InItem)
 	{
 		HeldActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeldSocketName);
+		HeldItem = HeldActor;
+	}
+}
+
+void ACookCharacter::DropItem(AActor* InItem)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Drop!"));
+	if (InItem)
+	{
+		InItem -> DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		HeldItem = nullptr;
 	}
 }
 

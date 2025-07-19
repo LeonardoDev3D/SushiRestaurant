@@ -26,6 +26,7 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Conditions")
 	bool bShouldMove = false;
 
+	// Get Character Speed
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Settings")
 	float Speed = 0.0f;
 
@@ -36,9 +37,6 @@ protected:
 	UPROPERTY()
 	ACookCharacter* CharacterPtr =nullptr;
 
-	
-
-	
 protected:
 	virtual void NativeInitializeAnimation() override;
 

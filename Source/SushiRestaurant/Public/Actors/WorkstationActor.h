@@ -5,26 +5,25 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Library/Enums/CookGameEnums.h"
-#include "IngredientActor.generated.h"
+#include "WorkstationActor.generated.h"
 
 UCLASS()
-class SUSHIRESTAURANT_API AIngredientActor : public AActor
+class SUSHIRESTAURANT_API AWorkstationActor : public AActor
 {
 	GENERATED_BODY()
-	
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* IngredientMesh;
+	UStaticMeshComponent* WorkstationMesh;
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+	TArray<EIngredientType> IngredientsList;
+	
 public:	
 	// Sets default values for this actor's properties
-	AIngredientActor();
+	AWorkstationActor();
 
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Settings")
-	EIngredientType IngredientType;
-	
-	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -34,5 +33,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
-	
+
+	UFUNCTION(Server, Reliable)
+	void ServerProcessIngredient(AIngredientActor* Ingredient);
 };
