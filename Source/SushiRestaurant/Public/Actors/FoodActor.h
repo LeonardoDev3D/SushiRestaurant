@@ -16,7 +16,7 @@ public:
 	// Sets default values for this actor's properties
 	AFoodActor();
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FoodActor")
+	UPROPERTY(Replicated, EditDefaultsOnly, BlueprintReadOnly, Category = "FoodActor")
 	EFoodType FoodType;
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = Mesh)

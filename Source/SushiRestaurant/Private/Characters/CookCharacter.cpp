@@ -14,6 +14,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Actors/IngredientActor.h"
+#include "Actors/TrashActor.h"
 #include "Actors/WorkstationActor.h"
 #include "Net/UnrealNetwork.h"
 
@@ -96,7 +97,13 @@ void ACookCharacter::Interact()
 
 void ACookCharacter::DiscardIngredients()
 {
-	Server_DropItem(HeldItem);
+	// If is a food, don't drop
+	AFoodActor* FoodActor = Cast<AFoodActor>(HeldItem);
+	if (!FoodActor)
+	{
+		Server_DropItem(HeldItem);
+	}
+	
 }
 
 
@@ -124,7 +131,7 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 	{
 		// Store workstation case its traced
 		AWorkstationActor* Workstation = Cast<AWorkstationActor>(Hit.GetActor());
-		
+		ATrashActor* Trash = Cast<ATrashActor>(Hit.GetActor());
 		if (!HeldItem)
 		{
 			// Grab ingredient
@@ -132,12 +139,18 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 			{
 				GrabItem(Ingredient);
 			}
+			if (Workstation)
+			{
+				// Collect read food if the same is done
+				Workstation-> Server_CollectDish(this);
+			}
 		}
 		else
 		{
-			// Add ingredients on workstation
-			if (Workstation )
+			
+			if (Workstation)
 			{
+				// Add ingredients on workstation
 				if (AIngredientActor*Ingredient = Cast<AIngredientActor>(HeldItem))
 				{
 					if (Workstation->GetCurrentAddedIngredients() < 2)
@@ -149,6 +162,18 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 				}
 				
 			}
+
+			if (Trash)
+			{
+				// throw in the trash
+				if (HeldItem)
+				{
+					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Trash!"));
+					HeldItem -> Destroy();
+					HeldItem = nullptr;
+				}
+			
+			}
 			
 		}
 
@@ -157,10 +182,10 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 			// When the player puts the right ingredients, begin cook
 			if (Workstation->GetCurrentAddedIngredients() == 2)
 			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Begin cook!"));
 				Workstation-> Server_ProcessIngredient();
 			}
 		}
+		
 		
 	}
 		
@@ -169,6 +194,8 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 void ACookCharacter::GrabItem(AActor* InItem)
 {
 	// Grab ingredient
+	if (HeldItem)return;
+	
 	if (AActor* HeldActor = InItem)
 	{
 		HeldActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeldSocketName);

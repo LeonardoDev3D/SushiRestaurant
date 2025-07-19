@@ -57,6 +57,9 @@ public:
 public:
 	// Sets default values for this character's properties
 	ACookCharacter();
+
+	void GrabItem(AActor* InItem);
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -82,10 +85,7 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_TraceInteract(FVector InStart, FVector InEnd, FVector Extent, FRotator Rotation);
 	void Multicast_TraceInteract_Implementation(FVector InStart, FVector InEnd, FVector Extent, FRotator Rotation);
-
-	void GrabItem(AActor* InItem);
-
-
+	
 	UFUNCTION(Server, Reliable)
 	void Server_DropItem(AActor* InItem);
 	void Server_DropItem_Implementation(AActor* InItem);
@@ -96,6 +96,9 @@ protected:
 	
 	void DropItem(AActor* InItem);
 public:
+	
+	UFUNCTION(BlueprintPure)
+	AActor * GetHeldItem()const{return HeldItem;}
 	
 	/** Handles move inputs from either controls or UI interfaces */
 	UFUNCTION(BlueprintCallable, Category="Input")

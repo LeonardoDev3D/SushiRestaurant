@@ -38,10 +38,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WorkstationSettings")
 	TSubclassOf<AFoodActor> FoodClass ;
+
+	UPROPERTY(Replicated)
+	AFoodActor* FinalFoodActor = nullptr;
 public:	
 	// Sets default values for this actor's properties
 	AWorkstationActor();
 
+	UFUNCTION(BlueprintPure)
+	EWorkstationState GetState() const { return CurrentState; }
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

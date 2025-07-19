@@ -5,6 +5,7 @@
 
 #include "Actors/FoodActor.h"
 #include "Actors/IngredientActor.h"
+#include "Characters/CookCharacter.h"
 #include "Library/Structs/CookGameStructs.h"
 #include "Components/SceneComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -46,6 +47,7 @@ void AWorkstationActor::GetLifetimeReplicatedProps(TArray<class FLifetimePropert
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(AWorkstationActor, CurrentIngredients);
 	DOREPLIFETIME(AWorkstationActor, CurrentState);
+	DOREPLIFETIME(AWorkstationActor, FinalFoodActor);
 }
 
 void AWorkstationActor::Server_AddIngredient_Implementation(AIngredientActor* Ingredient)
@@ -94,7 +96,14 @@ void AWorkstationActor::Server_ProcessIngredient_Implementation()
 
 void AWorkstationActor::Server_CollectDish_Implementation(class ACookCharacter* Player)
 {
+	// Verify if player can collect dish
+	if (!FinalFoodActor && CurrentState != EWorkstationState::Ready) return;
+	if (Player->GetHeldItem()) return;
 	
+	Player -> GrabItem(FinalFoodActor);
+	FinalFoodActor = nullptr;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Take food!"));
+	SetState(EWorkstationState::StandBy);
 }
 
 EFoodType AWorkstationActor::DetermineDishResult() const
@@ -185,7 +194,11 @@ void AWorkstationActor::Server_SpawnFood_Implementation(FVector Location, EFoodT
 		FinalDish->OnFoodSpawned();
 		
 		UGameplayStatics::FinishSpawningActor(FinalDish, SpawnTransform);
+
+		FinalFoodActor = FinalDish;
 	}
+
+	
 }
 
 void AWorkstationActor::OnRep_WorkstationState()

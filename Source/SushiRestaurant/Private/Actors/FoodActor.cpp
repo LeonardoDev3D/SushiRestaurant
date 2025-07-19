@@ -3,6 +3,8 @@
 
 #include "Actors/FoodActor.h"
 
+#include "Net/UnrealNetwork.h"
+
 // Sets default values
 AFoodActor::AFoodActor()
 {
@@ -30,11 +32,12 @@ void AFoodActor::Tick(float DeltaTime)
 void AFoodActor::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	
+	DOREPLIFETIME(AFoodActor, FoodType);
 }
 
 void AFoodActor::OnFoodSpawned_Implementation()
 {
 	// Used on blueprint
+	
 }
 
