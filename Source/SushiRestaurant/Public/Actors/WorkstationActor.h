@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Library/Enums/CookGameEnums.h"
+#include "Library/Structs/CookGameStructs.h"
 #include "WorkstationActor.generated.h"
 
 UCLASS()
@@ -16,8 +17,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* WorkstationMesh;
-
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "WorkstationSettings")
 	TArray<EIngredientType> IngredientsList;
 	
 	UPROPERTY(ReplicatedUsing=OnRep_WorkstationState, BlueprintReadOnly)
@@ -27,6 +28,13 @@ protected:
 	
 	UPROPERTY(Replicated)
 	TArray<AIngredientActor*> CurrentIngredients;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WorkstationSettings")
+	TArray<FFoodRecipe> RecipesList;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "WorkstationSettings")
+	bool AttachIngredients = false;
+
 	
 public:	
 	// Sets default values for this actor's properties
@@ -36,6 +44,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
+	
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -57,8 +67,11 @@ public:
 	void Server_CollectDish(class ACookCharacter* Player);
 	void Server_CollectDish_Implementation(class ACookCharacter* Player);
 
+	
 protected:
 
+	EFoodType DetermineDishResult() const;
+	
 	void FinishProcessing();
 
 	UFUNCTION()					

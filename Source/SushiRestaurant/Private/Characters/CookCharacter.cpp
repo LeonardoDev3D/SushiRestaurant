@@ -154,6 +154,7 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 
 		if (Workstation)
 		{
+			// When the player puts the right ingredients, begin cook
 			if (Workstation->GetCurrentAddedIngredients() == 2)
 			{
 				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Begin cook!"));

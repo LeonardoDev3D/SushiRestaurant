@@ -28,6 +28,19 @@ enum class EIngredientType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EFoodType : uint8
+{
+	Dango,
+	Wasabi,
+	SalmonNigiri,
+	EbiNigiri,
+	OctopusNigiri,
+	Ramen,
+	SeaUrchinRoll,
+	Slop
+};
+
+UENUM(BlueprintType)
 enum class EWorkstationState : uint8
 {
 	StandBy,     // No ingredients

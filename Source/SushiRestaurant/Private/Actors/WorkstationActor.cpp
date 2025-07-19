@@ -4,6 +4,8 @@
 #include "Actors/WorkstationActor.h"
 
 #include "Actors/IngredientActor.h"
+#include "Library/Structs/CookGameStructs.h"
+#include "Components/SceneComponent.h"
 #include "Net/UnrealNetwork.h"
 
 // Sets default values
@@ -20,6 +22,13 @@ AWorkstationActor::AWorkstationActor()
 void AWorkstationActor::BeginPlay()
 {
 	Super::BeginPlay();
+	
+}
+
+void AWorkstationActor::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+	
 	
 }
 
@@ -50,7 +59,24 @@ void AWorkstationActor::Server_AddIngredient_Implementation(AIngredientActor* In
 	if (CurrentIngredients.Num() < 2)
 	{
 		CurrentIngredients.Add(Ingredient);
-		Ingredient->Destroy();
+		if (AttachIngredients)
+		{
+			Ingredient->AttachToActor(this,FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+			if (CurrentIngredients.Num() > 1)
+			{
+				Ingredient-> SetActorLocation(CurrentIngredients[CurrentIngredients.Num()-1]->GetActorLocation() + FVector(0,0,40.0f));
+			}
+			else
+			{
+				Ingredient-> SetActorLocation(GetActorLocation() + FVector(0,0,20.0f));
+			}
+			
+		}
+		else
+		{
+			Ingredient->Destroy();
+		}
+		
 		SetState(EWorkstationState::Adding);
 	}
 }
@@ -69,11 +95,71 @@ void AWorkstationActor::Server_CollectDish_Implementation(class ACookCharacter* 
 	
 }
 
+EFoodType AWorkstationActor::DetermineDishResult() const
+{
+	// Collect the added ingredients
+	TArray<EIngredientType> Types;
+	for (AIngredientActor* Ing : CurrentIngredients)
+	{
+		if (Ing)
+			Types.Add(Ing->IngredientType);
+	}
+
+	
+	Types.Sort();
+
+	// Find the recipes in a list
+	for (const FFoodRecipe& Recipe : RecipesList)
+	{
+		if (Recipe.RequiredIngredients.Num() == Types.Num())
+		{
+			TArray<EIngredientType> SortedReq = Recipe.RequiredIngredients;
+			SortedReq.Sort();
+
+			bool bMatch = true;
+			for (int32 i = 0; i < Types.Num(); i++)
+			{
+				if (Types[i] != SortedReq[i])
+				{
+					bMatch = false;
+					break;
+				}
+			}
+
+			if (bMatch)
+				return Recipe.FoodResult;
+		}
+	}
+
+	// No one recept found => Slop
+	return EFoodType::Slop;
+}
+
 void AWorkstationActor::FinishProcessing()
 {
+	// Get the food result based on recepts 
+	EFoodType FoodResult = DetermineDishResult();
+
+	if (AttachIngredients)
+	{
+		for (AActor* Ingredient : CurrentIngredients)
+		{
+			if (IsValid(Ingredient))
+			{
+				Ingredient->Destroy();
+			}
+		}	
+	}
+	
 	CurrentIngredients.Empty();
+	
 	SetState(EWorkstationState::Ready);
+	
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Finished cook!"));
+
+	// Debug food name
+	FString FoodResultName = StaticEnum<EFoodType>()->GetValueAsString(FoodResult);
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Food is %s!"), *FoodResultName));
 }
 
 void AWorkstationActor::OnRep_WorkstationState()

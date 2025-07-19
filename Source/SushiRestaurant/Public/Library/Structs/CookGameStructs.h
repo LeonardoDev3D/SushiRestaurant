@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Actors/WorkstationActor.h"
 #include "CookGameStructs.generated.h"
 
 USTRUCT(BlueprintType)
@@ -12,7 +11,7 @@ struct FOrder
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TArray<EIngredientType> RequiredIngredients;
+	TArray<EFoodType> RequiredFoods;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float TimeRemaining = 30.f; // limit time to do the order
@@ -26,6 +25,9 @@ struct FFoodRecipe
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<EIngredientType> RequiredIngredients;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EFoodType FoodResult;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float ProcessingTime = 5.f;
