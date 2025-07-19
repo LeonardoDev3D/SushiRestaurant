@@ -1,0 +1,28 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "CookGameEnums.generated.h"
+/**
+ * 
+ */
+UENUM(BlueprintType)
+enum class EIngredientType : uint8
+{
+	Avocado,
+	Crabsticks,
+	Cucumber,
+	Ebi,
+	Eel,
+	Fish,
+	FishFillet,
+	Flounder,
+	Mackerel,
+	Nori,
+	Octopus,
+	Rice,
+	Salmon,
+	SeaUrchin,
+	MAX
+};
