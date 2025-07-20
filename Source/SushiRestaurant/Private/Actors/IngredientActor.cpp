@@ -31,5 +31,7 @@ void AIngredientActor::Tick(float DeltaTime)
 void AIngredientActor::GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AIngredientActor,IngredientType);
 }
 

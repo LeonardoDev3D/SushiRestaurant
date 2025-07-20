@@ -21,7 +21,7 @@ public:
 	AIngredientActor();
 
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category= "Settings")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category= "Settings")
 	EIngredientType IngredientType;
 	
 	

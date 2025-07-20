@@ -213,6 +213,7 @@ void ACookCharacter::GrabItem(AActor* InItem)
 	if (AActor* HeldActor = InItem)
 	{
 		HeldActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeldSocketName);
+		HeldActor-> SetActorEnableCollision(false);
 		HeldItem = HeldActor;
 	}
 }
@@ -233,6 +234,7 @@ void ACookCharacter::DropItem(AActor* InItem)
 	if (InItem)
 	{
 		InItem -> DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		InItem-> SetActorEnableCollision(true);
 		HeldItem = nullptr;
 	}
 }
