@@ -99,6 +99,11 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void Server_DeliveryToTable(AOrderTableActor* Table, AFoodActor* Food);
 	void Server_DeliveryToTable_Implementation(AOrderTableActor* Table, AFoodActor* Food);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetItem(AActor* InItem);
+	void Server_SetItem_Implementation(AActor* InItem);
+	
 public:
 	
 	UFUNCTION(BlueprintPure)

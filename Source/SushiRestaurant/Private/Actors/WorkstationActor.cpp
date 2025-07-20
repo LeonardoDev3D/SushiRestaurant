@@ -39,7 +39,7 @@ void AWorkstationActor::OnConstruction(const FTransform& Transform)
 
 void AWorkstationActor::OnStateChanged_Implementation(EWorkstationState newState)
 {
-	
+	// Used on Blueprint
 }
 
 // Called every frame
@@ -63,10 +63,14 @@ void AWorkstationActor::Server_AddIngredient_Implementation(AIngredientActor* In
 	if (!Ingredient) return; // Check if ingredient is valid -> Avoid null actors
 
 	if (CurrentState == EWorkstationState::Processing || CurrentState == EWorkstationState::Ready) return; // Check if the workstation is in use
-	
+
+	// If the number of ingredients on workstation is lass than 2 (Limit), new ingredients can be added
 	if (CurrentIngredients.Num() < 2)
 	{
+		// Add ingredients
 		CurrentIngredients.Add(Ingredient);
+
+		// Verify if the workstation accepts attach ingredients or not 
 		if (AttachIngredients)
 		{
 			Multicast_AttachIngredient(Ingredient);
@@ -82,6 +86,8 @@ void AWorkstationActor::Server_AddIngredient_Implementation(AIngredientActor* In
 
 void AWorkstationActor::Multicast_AttachIngredient_Implementation(AIngredientActor* Ingredient)
 {
+	// Attach ingredients on workstation, case if the workstation permits this action
+	Ingredient->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	Ingredient->AttachToActor(this,FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	if (CurrentIngredients.Num() > 1)
 	{
@@ -125,7 +131,7 @@ EFoodType AWorkstationActor::DetermineDishResult() const
 			Types.Add(Ing->IngredientType);
 	}
 
-	
+	// Puts all ingredients in a right order
 	Types.Sort();
 
 	// Find the recipes in a list
@@ -151,7 +157,7 @@ EFoodType AWorkstationActor::DetermineDishResult() const
 		}
 	}
 
-	// No one recept found => Slop
+	// No one recept found will cook a Slop food
 	return EFoodType::Slop;
 }
 

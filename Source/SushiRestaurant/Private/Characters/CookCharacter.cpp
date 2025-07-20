@@ -134,6 +134,9 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 		AWorkstationActor* Workstation = Cast<AWorkstationActor>(Hit.GetActor());
 		ATrashActor* Trash = Cast<ATrashActor>(Hit.GetActor());
 		AOrderTableActor* Table = Cast<AOrderTableActor>(Hit.GetActor());
+
+		// Actor is not on server, don`t interact
+		if (!Hit.GetActor()->HasAuthority()) return;
 		
 		if (!HeldItem)
 		{
@@ -161,6 +164,7 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 					{
 						Workstation-> Server_AddIngredient(Ingredient);
 						HeldItem = nullptr;
+						Server_SetItem(nullptr);
 					}
 					
 				}
@@ -175,6 +179,7 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Trash!"));
 					HeldItem -> Destroy();
 					HeldItem = nullptr;
+					Server_SetItem(nullptr);
 				}
 			
 			}
@@ -216,6 +221,7 @@ void ACookCharacter::GrabItem(AActor* InItem)
 		HeldActor->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, HeldSocketName);
 		HeldActor-> SetActorEnableCollision(false);
 		HeldItem = HeldActor;
+		Server_SetItem(HeldActor);
 	}
 }
 
@@ -237,6 +243,7 @@ void ACookCharacter::DropItem(AActor* InItem)
 		InItem -> DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		InItem-> SetActorEnableCollision(true);
 		HeldItem = nullptr;
+		Server_SetItem(nullptr);
 	}
 }
 
@@ -248,7 +255,13 @@ void ACookCharacter::Server_DeliveryToTable_Implementation(AOrderTableActor* Tab
 		Table->Server_DeliverOrder(Food,PC);
 		HeldItem -> Destroy();
 		HeldItem = nullptr;
+		Server_SetItem(nullptr);
 	}
+}
+
+void ACookCharacter::Server_SetItem_Implementation(AActor* InItem)
+{
+	HeldItem = InItem;
 }
 
 void ACookCharacter::DoMove(float Right, float Forward)
@@ -304,7 +317,7 @@ void ACookCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		// Interact
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ACookCharacter::Interact);
 
-		// Discard Ingredients
+		// Discard/ Drop Ingredients
 		EnhancedInputComponent->BindAction(DiscardAction, ETriggerEvent::Started, this, &ACookCharacter::DiscardIngredients);
 	}
 	

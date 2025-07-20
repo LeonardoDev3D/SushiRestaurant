@@ -17,6 +17,7 @@ void ACookGameMode::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
 
+	// Limits first delay on order interval to prevent the first order spawn after the next orders
 	if (FirstOrderSpawnDelay > OrderInterval)
 	{
 		FirstOrderSpawnDelay = OrderInterval;

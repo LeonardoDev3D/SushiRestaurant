@@ -22,7 +22,7 @@ void ACookGameState::InitializeTablesAndOrders()
 	Tables.Empty();
 	TableOrders.Empty();
 
-	// Busca todas as mesas no mapa
+	// Search all tables from level
 	TArray<AActor*> FoundTables;
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AOrderTableActor::StaticClass(), FoundTables);
 

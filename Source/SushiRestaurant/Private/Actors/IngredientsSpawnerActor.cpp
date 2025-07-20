@@ -104,6 +104,7 @@ void AIngredientsSpawnerActor::Server_SpawnIngredient_Implementation(FVector Loc
 	if (Ingredient)
 	{
 		Ingredient->IngredientType = InIngredientType;
+		Ingredient->SetReplicates(true);
 		UGameplayStatics::FinishSpawningActor(Ingredient, SpawnTransform);
 	}
 

@@ -21,23 +21,27 @@ void AOrderTableActor::Server_DeliverOrder_Implementation(AFoodActor* Food,APlay
 {
 	if (!Food) return;
 
+	// Get player controller and Gamestate references
 	ACookPlayerState* PS =InstigatorPC->GetPlayerState<ACookPlayerState>();
 	ACookGameState* GS = GetWorld()->GetGameState<ACookGameState>();
 
 	if (PS && GS && GS->TableOrders.IsValidIndex(TableIndex))
 	{
+		// Get current order from Game state
 		const FOrder& CurrentOrder = GS->TableOrders[TableIndex];
 
 		if (CurrentOrder.RequiredFoods.Contains(Food->FoodType))
 		{
+			// Add points whe delivers correct food on the correct table
+			
 			PS->AddScore(100);
 			GS->ClearOrderForTable(TableIndex);
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf( TEXT("Correct food! Order done %d!"), TableIndex));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf( TEXT("Correct food! Order done %d!"), TableIndex));
 		}
 		else
 		{
 			GS->ClearOrderForTable(TableIndex);
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf( TEXT("Incorrect food %d!"), TableIndex));
+			//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf( TEXT("Incorrect food %d!"), TableIndex));
 		}
 	}
 }
