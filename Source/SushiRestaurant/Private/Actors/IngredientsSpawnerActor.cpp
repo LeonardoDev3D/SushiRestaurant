@@ -20,23 +20,20 @@ void AIngredientsSpawnerActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (IngredientClass && TotalToSpawn > 0)
+	if (HasAuthority() && IngredientClass && TotalToSpawn > 0)
 	{
 
 		// Spawn at moment of begin play
-		Server_SpawnIngredient(GetActorLocation() +
-			  (GetActorForwardVector()*FMath::FRandRange(-RandomSpawnOffset.X , RandomSpawnOffset.X)) +
-			  (GetActorRightVector()*FMath::FRandRange(-RandomSpawnOffset.Y , RandomSpawnOffset.Y)) ,
-			  IngredientTypeToSpawn);
+		TrySpawnIngredient();
 
 		// Now will spawn every spawn interval 
-		GetWorld()->GetTimerManager().SetTimer(SpawnTimer, [&]()
-		{
-	      Server_SpawnIngredient(GetActorLocation() +
-	          (GetActorForwardVector()*FMath::FRandRange(-RandomSpawnOffset.X , RandomSpawnOffset.X)) +
-	          (GetActorRightVector()*FMath::FRandRange(-RandomSpawnOffset.Y , RandomSpawnOffset.Y)) ,
-	          IngredientTypeToSpawn);
-		}, SpawnInterval, false);
+		GetWorld()->GetTimerManager().SetTimer(
+		   SpawnTimer,
+		   this,
+		   &AIngredientsSpawnerActor::TrySpawnIngredient,
+		   SpawnInterval,
+		   true 
+	   );
 		
 		
 	}
@@ -49,6 +46,23 @@ void AIngredientsSpawnerActor::GetLifetimeReplicatedProps(TArray<class FLifetime
 	DOREPLIFETIME(AIngredientsSpawnerActor,SpawnedCount);
 }
 
+
+void AIngredientsSpawnerActor::TrySpawnIngredient()
+{
+	if (!HasAuthority()) return;
+
+	int32 CurrentCount = CheckExistingIngredients();
+
+	if (CurrentCount < TotalToSpawn)
+	{
+		Server_SpawnIngredient(
+			GetActorLocation() +
+			(GetActorForwardVector() * FMath::FRandRange(-RandomSpawnOffset.X , RandomSpawnOffset.X)) +
+			(GetActorRightVector() * FMath::FRandRange(-RandomSpawnOffset.Y , RandomSpawnOffset.Y)),
+			IngredientTypeToSpawn
+		);
+	}
+}
 
 int32 AIngredientsSpawnerActor::CheckExistingIngredients() const
 {
@@ -72,34 +86,29 @@ void AIngredientsSpawnerActor::Server_SpawnIngredient_Implementation(FVector Loc
 {
 	
 	int32 CurrentCount = CheckExistingIngredients();
+	if (CurrentCount >= TotalToSpawn) return;
 
-	while (CurrentCount < TotalToSpawn)
+	// Creating Spawn transform
+	FTransform SpawnTransform;
+	SpawnTransform.SetLocation(Location);
+	SpawnTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
+
+	AIngredientActor* Ingredient = Cast<AIngredientActor>(
+		UGameplayStatics::BeginDeferredActorSpawnFromClass(
+			this,
+			IngredientClass,
+			SpawnTransform
+		)
+	);
+
+	if (Ingredient)
 	{
-		// Make Spawn Tranforms
-		FTransform SpawnTransform;
-		SpawnTransform.SetLocation(Location);
-		SpawnTransform.SetRotation(FRotator::ZeroRotator.Quaternion());
-
-		// Begin Spawn
-		AIngredientActor* Ingredient = Cast<AIngredientActor>(
-			UGameplayStatics::BeginDeferredActorSpawnFromClass(
-				this,
-				IngredientClass,
-				SpawnTransform
-			)
-		);
-
-		if (Ingredient)
-		{
-			Ingredient->IngredientType = InIngredientType;
-			UGameplayStatics::FinishSpawningActor(Ingredient, SpawnTransform);
-		}
-
-		CurrentCount = CheckExistingIngredients();
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Ingredients spawned: %d"), CurrentCount));
+		Ingredient->IngredientType = InIngredientType;
+		UGameplayStatics::FinishSpawningActor(Ingredient, SpawnTransform);
 	}
-	
-	SpawnedCount = CurrentCount;
+
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Ingredients spawned: %d"), CurrentCount));
+	SpawnedCount = CheckExistingIngredients();
 	
 }
 

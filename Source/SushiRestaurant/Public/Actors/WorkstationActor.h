@@ -52,6 +52,10 @@ protected:
 	virtual void BeginPlay() override;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void OnStateChanged(EWorkstationState newState);
+	virtual void OnStateChanged_Implementation(EWorkstationState newState);
 	
 public:	
 	// Called every frame

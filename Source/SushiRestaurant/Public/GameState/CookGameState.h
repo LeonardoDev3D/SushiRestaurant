@@ -41,6 +41,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Orders")
 	void ClearOrderForTable(int32 TableIndex);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Cooking")
+	void OnOrderUpdated();
+	virtual void OnOrderUpdated_Implementation();
+	
 protected:
 
 	virtual void BeginPlay() override;

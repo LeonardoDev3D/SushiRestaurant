@@ -31,22 +31,27 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Spawner")
 	FVector2D RandomSpawnOffset = FVector2D::ZeroVector;
+
+	UPROPERTY(Replicated)
+	int32 SpawnedCount = 0;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<class FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	FTimerHandle SpawnTimer;
 
-	UPROPERTY(Replicated)
-	int32 SpawnedCount = 0;
-
-	int32 CheckExistingIngredients() const;
 	
-	UFUNCTION(server, reliable)
-	void Server_SpawnIngredient(FVector Location, EIngredientType InIngredientType );
-    void Server_SpawnIngredient_Implementation(FVector Location, EIngredientType InIngredientType );
+	void TrySpawnIngredient();
+
+	
+	int32 CheckExistingIngredients() const;
+
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnIngredient(FVector Location, EIngredientType InIngredientType);
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 public:	
 	// Called every frame

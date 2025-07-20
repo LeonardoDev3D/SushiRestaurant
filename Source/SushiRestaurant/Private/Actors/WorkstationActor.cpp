@@ -35,6 +35,13 @@ void AWorkstationActor::OnConstruction(const FTransform& Transform)
 	
 }
 
+
+
+void AWorkstationActor::OnStateChanged_Implementation(EWorkstationState newState)
+{
+	
+}
+
 // Called every frame
 void AWorkstationActor::Tick(float DeltaTime)
 {
@@ -90,6 +97,7 @@ void AWorkstationActor::Server_ProcessIngredient_Implementation()
 	if (CurrentState != EWorkstationState::Adding) return;
 
 	SetState(EWorkstationState::Processing);
+	
 	GetWorld()->GetTimerManager().SetTimer(ProcessingTimer, this, &AWorkstationActor::FinishProcessing, 5.0f, false);
 	
 }
@@ -102,7 +110,7 @@ void AWorkstationActor::Server_CollectDish_Implementation(class ACookCharacter* 
 	
 	Player -> GrabItem(FinalFoodActor);
 	FinalFoodActor = nullptr;
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Take food!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Take food!"));
 	SetState(EWorkstationState::StandBy);
 }
 
@@ -209,6 +217,7 @@ void AWorkstationActor::OnRep_WorkstationState()
 void AWorkstationActor::SetState(EWorkstationState NewState)
 {
 	CurrentState = NewState;
+	OnStateChanged(CurrentState);
 	OnRep_WorkstationState();
 }
 

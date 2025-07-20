@@ -36,9 +36,11 @@ void ACookGameMode::SpawnOrder()
 	
 	GS->SetOrderForTable(TableIndex, NewOrder);
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("New order created for the table %d"),TableIndex));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("New order created for the table %d"),TableIndex));
 
 	// --- DEBUG FOOD ---
+
+	/*
 	FString IngredientList;
 	for (EFoodType Ingredient : NewOrder.RequiredFoods)
 	{
@@ -46,6 +48,8 @@ void ACookGameMode::SpawnOrder()
 		IngredientList += Name + TEXT(" ");
 	}
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Yellow,FString::Printf(TEXT("Table %d Did Order: %s"), TableIndex, *IngredientList));
+	*/
+
 }
 
 AActor* ACookGameMode::ChoosePlayerStart_Implementation(AController* Player)

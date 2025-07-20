@@ -30,6 +30,7 @@ enum class EIngredientType : uint8
 UENUM(BlueprintType)
 enum class EFoodType : uint8
 {
+	
 	Dango,
 	Wasabi,
 	SalmonNigiri,
@@ -37,6 +38,7 @@ enum class EFoodType : uint8
 	OctopusNigiri,
 	Ramen,
 	SeaUrchinRoll,
+	None,
 	Slop
 };
 

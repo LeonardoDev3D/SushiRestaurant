@@ -172,7 +172,7 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 				// throw in the trash
 				if (HeldItem)
 				{
-					GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Trash!"));
+					//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Trash!"));
 					HeldItem -> Destroy();
 					HeldItem = nullptr;
 				}
@@ -182,7 +182,7 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 			if (Table)
 			{
 				// Delivery to table
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Interact with table!"));
+				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Interact with table!"));
 				AFoodActor* HeldFood = Cast<AFoodActor>(HeldItem);
 				Server_DeliveryToTable(Table,HeldFood);
 			}
@@ -230,7 +230,7 @@ void ACookCharacter::Multicast_DropItem_Implementation(AActor* InItem)
 
 void ACookCharacter::DropItem(AActor* InItem)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Drop!"));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Drop!"));
 	if (InItem)
 	{
 		InItem -> DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);

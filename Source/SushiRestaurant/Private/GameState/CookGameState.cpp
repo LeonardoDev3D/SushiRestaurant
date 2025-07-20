@@ -14,7 +14,7 @@ ACookGameState::ACookGameState()
 
 void ACookGameState::OnRep_Orders()
 {
-	// Used for UI
+	OnOrderUpdated();
 }
 
 void ACookGameState::InitializeTablesAndOrders()
@@ -30,12 +30,14 @@ void ACookGameState::InitializeTablesAndOrders()
 	{
 		if (AOrderTableActor* Table = Cast<AOrderTableActor>(Actor))
 		{
+			TArray<EFoodType> VoidOrderFoods;
+			VoidOrderFoods.Add(EFoodType::None);
 			Tables.Add(Table);
-			TableOrders.Add(FOrder()); // Create Void Order
+			TableOrders.Add(FOrder(VoidOrderFoods)); // Create Void Order
 		}
 	}
 
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Number of tables is %d"),Tables.Num()));
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Number of tables is %d"),Tables.Num()));
 }
 
 void ACookGameState::SetOrderForTable(int32 TableIndex, const FOrder& NewOrder)
@@ -54,6 +56,11 @@ void ACookGameState::ClearOrderForTable(int32 TableIndex)
 		TableOrders[TableIndex] = FOrder(); // Reset
 		OnRep_Orders();
 	}
+}
+
+void ACookGameState::OnOrderUpdated_Implementation()
+{
+	// Used on blueprints to update UI
 }
 
 void ACookGameState::BeginPlay()
