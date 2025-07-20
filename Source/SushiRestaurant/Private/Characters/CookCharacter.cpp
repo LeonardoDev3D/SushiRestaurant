@@ -84,11 +84,11 @@ void ACookCharacter::Look(const FInputActionValue& Value)
 
 void ACookCharacter::Interact()
 {
-	FVector Start = GetActorLocation() + 30.0f;
-	FVector End = Start + GetActorForwardVector() * 250.f;
+	FVector Start = GetActorLocation();
+	FVector End = Start + (GetActorForwardVector() * 65.0f);
 
 	// Box Size
-	FVector BoxHalfSize = FVector(30.f, 30.f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
+	FVector BoxHalfSize = FVector(130.f, GetCapsuleComponent()->GetScaledCapsuleRadius() * 0.75f, GetCapsuleComponent()->GetScaledCapsuleHalfHeight());
 
 	// Box rotation based on character rotation
 	FRotator Orientation = GetActorRotation();
@@ -197,9 +197,11 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 				Workstation-> Server_ProcessIngredient();
 			}
 		}
-		
+		// Draw debug box
 		
 	}
+
+	//DrawDebugBox(GetWorld(),InEnd,Extent,Rotation.Quaternion(),FColor::Red,false,2.0f);
 		
 }
 

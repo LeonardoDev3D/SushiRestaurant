@@ -26,6 +26,9 @@ public:
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Conditions")
 	bool bShouldMove = false;
 
+	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Conditions")
+	bool IsHeldObject = false;
+	
 	// Get Character Speed
 	UPROPERTY(VisibleAnywhere,BlueprintReadOnly, Category = "Settings")
 	float Speed = 0.0f;

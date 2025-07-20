@@ -41,4 +41,15 @@ void UCook_AnimInstance::UpdateMovement(float DeltaSeconds)
 	Speed = CharacterPtr -> GetVelocity().Size2D();
 	bIsMoving = Speed > 0.0f;
 	NormalizedSpeed = Speed / CharacterPtr -> GetCharacterMovement() -> MaxWalkSpeed;
+	
+	if (CharacterPtr -> GetHeldItem())
+	{
+		IsHeldObject = true;
+	}
+	else
+	{
+		IsHeldObject = false;
+	}
+	
+	 
 }
