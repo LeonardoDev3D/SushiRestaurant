@@ -21,8 +21,10 @@ public:
 
 	virtual void BeginPlay() override;
 
+#if WITH_EDITOR
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
-
+#endif
+	
 	/** Create new order */
 	UFUNCTION(BlueprintCallable, Category="Orders")
 	void SpawnOrder();

@@ -13,6 +13,7 @@ ACookGameMode::ACookGameMode()
 	
 }
 
+#if WITH_EDITOR
 void ACookGameMode::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
 {
 	Super::PostEditChangeProperty(PropertyChangedEvent);
@@ -23,6 +24,7 @@ void ACookGameMode::PostEditChangeProperty(FPropertyChangedEvent& PropertyChange
 		FirstOrderSpawnDelay = OrderInterval;
 	}
 }
+#endif
 
 void ACookGameMode::BeginPlay()
 {
