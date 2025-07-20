@@ -19,9 +19,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = Mesh, meta = (AllowPrivateAccess = "true"))
 	UStaticMeshComponent* WorkstationMesh;
 	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "WorkstationSettings")
-	TArray<EIngredientType> IngredientsList;
-	
 	UPROPERTY(ReplicatedUsing=OnRep_WorkstationState, BlueprintReadOnly)
 	EWorkstationState CurrentState;
 	
@@ -69,6 +66,10 @@ public:
 	UFUNCTION(Server, Reliable)		
 	void Server_AddIngredient(AIngredientActor* Ingredient);
 	void Server_AddIngredient_Implementation(AIngredientActor* Ingredient);
+
+	UFUNCTION(NetMulticast, Reliable)		
+	void Multicast_AttachIngredient(AIngredientActor* Ingredient);
+	void Multicast_AttachIngredient_Implementation(AIngredientActor* Ingredient);
 	
 	UFUNCTION(Server, Reliable)
 	void Server_ProcessIngredient();

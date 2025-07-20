@@ -13,10 +13,23 @@ ACookGameMode::ACookGameMode()
 	
 }
 
+void ACookGameMode::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+
+	if (FirstOrderSpawnDelay > OrderInterval)
+	{
+		FirstOrderSpawnDelay = OrderInterval;
+	}
+}
+
 void ACookGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// Create a first order
+	GetWorld()->GetTimerManager().SetTimer(FirstOrderSpawnTimer, this, &ACookGameMode::SpawnOrder, FirstOrderSpawnDelay, false);
+	
 	// Create a order after game begins
 	GetWorld()->GetTimerManager().SetTimer(OrderSpawnTimer, this, &ACookGameMode::SpawnOrder, OrderInterval, true);
 
@@ -28,7 +41,7 @@ void ACookGameMode::SpawnOrder()
 	if (!GS || GS->Tables.Num() == 0) return;
 
 	int32 TableIndex = FMath::RandRange(0, GS->Tables.Num() - 1);
-
+	
 	// Can be extendable later to do more one orders by table
 	FOrder NewOrder;
 	int32 RandType1 = FMath::RandRange(0, (int32)EFoodType::SeaUrchinRoll - 1);

@@ -17,13 +17,25 @@ public:
 
 	ACookPlayerState();
 	
-	UPROPERTY(Replicated, BlueprintReadOnly, Category="Score")
+	UPROPERTY(ReplicatedUsing=OnRep_PlayerScore, BlueprintReadOnly, Category="Score")
 	int32 PlayerScore = 0;
 	
 	UFUNCTION(BlueprintCallable, Category="Score")
 	void AddScore(int32 Points);
 
+	UFUNCTION(BlueprintNativeEvent)
+	void OnUpdateScore();
+	virtual void OnUpdateScore_Implementation();
+
+	UFUNCTION()
+	void OnRep_PlayerScore();
+
+	UFUNCTION(Server, Reliable)
+	void ServerAddScore(int32 Points);
+	void ServerAddScore_Implementation(int32 Points);
+	
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
+
+	virtual void BeginPlay() override;
 };

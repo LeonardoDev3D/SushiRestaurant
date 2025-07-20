@@ -40,11 +40,17 @@ void ACookGameState::InitializeTablesAndOrders()
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Number of tables is %d"),Tables.Num()));
 }
 
+bool ACookGameState::HasOrderForTable(int32 TableIndex) const
+{
+	return TableOrders.IsValidIndex(TableIndex) && TableOrders[0].RequiredFoods[0] != EFoodType::None; 
+}
+
 void ACookGameState::SetOrderForTable(int32 TableIndex, const FOrder& NewOrder)
 {
 	if (TableOrders.IsValidIndex(TableIndex))
 	{
 		TableOrders[TableIndex] = NewOrder;
+		OnOrderUpdated();
 		OnRep_Orders();
 	}
 }
@@ -54,6 +60,7 @@ void ACookGameState::ClearOrderForTable(int32 TableIndex)
 	if (TableOrders.IsValidIndex(TableIndex))
 	{
 		TableOrders[TableIndex] = FOrder(); // Reset
+		OnOrderUpdated();
 		OnRep_Orders();
 	}
 }

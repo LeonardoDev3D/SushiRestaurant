@@ -185,6 +185,7 @@ void ACookCharacter::Multicast_TraceInteract_Implementation(FVector InStart, FVe
 				//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Interact with table!"));
 				AFoodActor* HeldFood = Cast<AFoodActor>(HeldItem);
 				Server_DeliveryToTable(Table,HeldFood);
+				
 			}
 			
 		}
@@ -243,7 +244,9 @@ void ACookCharacter::Server_DeliveryToTable_Implementation(AOrderTableActor* Tab
 {
 	if (Table && Food)
 	{
-		Table->Server_DeliverOrder(Food);
+		APlayerController* PC = Cast<APlayerController>(GetController());
+		Table->Server_DeliverOrder(Food,PC);
+		HeldItem -> Destroy();
 		HeldItem = nullptr;
 	}
 }

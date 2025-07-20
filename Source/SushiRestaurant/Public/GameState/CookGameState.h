@@ -32,7 +32,9 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Orders")
 	void InitializeTablesAndOrders();
-	
+
+	bool HasOrderForTable(int32 TableIndex) const;
+
 	/** Defines a order for a table */
 	UFUNCTION(BlueprintCallable, Category="Orders")
 	void SetOrderForTable(int32 TableIndex, const FOrder& NewOrder);

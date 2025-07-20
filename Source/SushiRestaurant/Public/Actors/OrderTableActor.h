@@ -25,8 +25,8 @@ public:
 	AOrderTableActor();
 	
 	UFUNCTION(Server, Reliable)
-	void Server_DeliverOrder(AFoodActor* Food);
-	void Server_DeliverOrder_Implementation(AFoodActor* Food);
+	void Server_DeliverOrder(AFoodActor* Food,APlayerController* InstigatorPC);
+	void Server_DeliverOrder_Implementation(AFoodActor* Food,APlayerController* InstigatorPC);
 	
 protected:
 	// Called when the game starts or when spawned

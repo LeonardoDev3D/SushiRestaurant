@@ -17,11 +17,11 @@ AOrderTableActor::AOrderTableActor()
 	OrderTableCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("OrderTableCollision"));
 }
 
-void AOrderTableActor::Server_DeliverOrder_Implementation(AFoodActor* Food)
+void AOrderTableActor::Server_DeliverOrder_Implementation(AFoodActor* Food,APlayerController* InstigatorPC)
 {
 	if (!Food) return;
 
-	ACookPlayerState* PS = GetWorld()->GetFirstPlayerController()->GetPlayerState<ACookPlayerState>();
+	ACookPlayerState* PS =InstigatorPC->GetPlayerState<ACookPlayerState>();
 	ACookGameState* GS = GetWorld()->GetGameState<ACookGameState>();
 
 	if (PS && GS && GS->TableOrders.IsValidIndex(TableIndex))
@@ -32,14 +32,11 @@ void AOrderTableActor::Server_DeliverOrder_Implementation(AFoodActor* Food)
 		{
 			PS->AddScore(100);
 			GS->ClearOrderForTable(TableIndex);
-			Food->Destroy();
-
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf( TEXT("Correct food! Order done %d!"), TableIndex));
 		}
 		else
 		{
 			GS->ClearOrderForTable(TableIndex);
-			Food->Destroy();
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf( TEXT("Incorrect food %d!"), TableIndex));
 		}
 	}

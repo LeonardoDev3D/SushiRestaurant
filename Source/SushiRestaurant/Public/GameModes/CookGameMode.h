@@ -20,17 +20,25 @@ public:
 	ACookGameMode();
 
 	virtual void BeginPlay() override;
-	
+
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
 	/** Create new order */
 	UFUNCTION(BlueprintCallable, Category="Orders")
 	void SpawnOrder();
 
 protected:
-	FTimerHandle OrderSpawnTimer;
 
+	FTimerHandle FirstOrderSpawnTimer;
+	
+	FTimerHandle OrderSpawnTimer;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Orders")
 	float OrderInterval = 15.0f;
 
+	UPROPERTY(EditDefaultsOnly, Category="Orders")
+	float FirstOrderSpawnDelay = 15.0f;
+	
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	
 	UPROPERTY()

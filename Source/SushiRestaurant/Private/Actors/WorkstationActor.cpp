@@ -64,24 +64,12 @@ void AWorkstationActor::Server_AddIngredient_Implementation(AIngredientActor* In
 
 	if (CurrentState == EWorkstationState::Processing || CurrentState == EWorkstationState::Ready) return; // Check if the workstation is in use
 	
-	if (!IngredientsList.Contains(Ingredient->IngredientType)) return; // Check if this ingredient can be used on this workstation
-	
-	
 	if (CurrentIngredients.Num() < 2)
 	{
 		CurrentIngredients.Add(Ingredient);
 		if (AttachIngredients)
 		{
-			Ingredient->AttachToActor(this,FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-			if (CurrentIngredients.Num() > 1)
-			{
-				Ingredient-> SetActorLocation(CurrentIngredients[CurrentIngredients.Num()-1]->GetActorLocation() + FVector(0,0,40.0f));
-			}
-			else
-			{
-				Ingredient-> SetActorLocation(GetActorLocation() + FVector(0,0,20.0f));
-			}
-			
+			Multicast_AttachIngredient(Ingredient);
 		}
 		else
 		{
@@ -89,6 +77,19 @@ void AWorkstationActor::Server_AddIngredient_Implementation(AIngredientActor* In
 		}
 		
 		SetState(EWorkstationState::Adding);
+	}
+}
+
+void AWorkstationActor::Multicast_AttachIngredient_Implementation(AIngredientActor* Ingredient)
+{
+	Ingredient->AttachToActor(this,FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	if (CurrentIngredients.Num() > 1)
+	{
+		Ingredient-> SetActorLocation(CurrentIngredients[CurrentIngredients.Num()-1]->GetActorLocation() + FVector(0,0,40.0f));
+	}
+	else
+	{
+		Ingredient-> SetActorLocation(GetActorLocation() + FVector(0,0,20.0f));
 	}
 }
 
